@@ -64,24 +64,34 @@ void ofApp::setup()
 
     panel.loadFromFile("settings.xml");
 
-    cam.setDistance(500);
+    cam.setDistance(00);
 
-    targetPosition.set(0, 0, -100);
+    targetPosition.set(0, 0, 0);
+    
+
+    panel.add(posx.setup("posx", 0, -1000, 1000));
+    panel.add(posy.setup("posy", 0, -500, 500));
+    panel.add(posz.setup("posz", 0, -1500, 1500));
+    panel.add(camxx.setup("camx", 0, -5000, 5000));
+    panel.add(camyy.setup("camy", 0, -500, 500));
+    panel.add(camzz.setup("camz", 0, -2000, 2000));
 }
 
 
 void ofApp::update()
 {
-    cam.lookAt(targetPosition);
-    float radius = 500; // Adjust the radius of rotation as needed
+
+    lookPosition.set(posx, posy, posz);
+    cam.lookAt(lookPosition);
+    float radius = 1000; // Adjust the radius of rotation as needed
     float camX = targetPosition.x + radius * cos(rotationAngle);
     float camY = targetPosition.y ;
     float camZ = targetPosition.z + radius * sin(rotationAngle); // Adjust the camera's height if needed
-
+    
     // Set the camera position
     cam.setPosition(camX, camY, camZ);
     // Increment the rotation angle
-    rotationAngle += 0.1;
+    rotationAngle += 0.01;
     ofColor myNewColor;
     for (int d = 0; d < kinects.size(); d++)
     {
@@ -122,9 +132,9 @@ void ofApp::update()
                         puntoReal = kinects[d]->getWorldCoordinateAt(x, y);
                         
                         
-                        if (puntoReal.z > 0)
+                        if (puntoReal.z > 1)
                         {
-                            if (puntoReal.z < 1.5)
+                            if (puntoReal.z < 3)
                             {
                                 myNewColor = kinects[d]->getRegisteredPixels().getColor(x, y);
                                 if (caso == 4)
@@ -229,7 +239,7 @@ void ofApp::draw()
         glPointSize(2);
         // Set the initial target position
         ofPushMatrix();
-        ofScale(1000, -1000, -1000);
+        ofScale(1500, -1500, -1500);
         pointCloud.draw();
         ofPopMatrix();
         cam.end();

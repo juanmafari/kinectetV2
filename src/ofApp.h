@@ -54,7 +54,11 @@ public:
     ofMesh pointCloud;
 
     ofVec3f targetPosition;
+    ofVec3f lookPosition;
     float rotationAngle = 0.01;
+
+    ofxFloatSlider posx, posy, posz, camxx,camyy,camzz;
+
     
     
     bool showPointCloud = false;

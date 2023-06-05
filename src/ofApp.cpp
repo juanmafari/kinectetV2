@@ -75,11 +75,14 @@ void ofApp::setup()
     panel.add(camxx.setup("camx", 0, -5000, 5000));
     panel.add(camyy.setup("camy", 0, -500, 500));
     panel.add(camzz.setup("camz", 0, -2000, 2000));
+
+    font.load("frabk.ttf", 400);
 }
 
 
 void ofApp::update()
 {
+    int delay = 1000;
 
     lookPosition.set(posx, posy, posz);
     cam.lookAt(lookPosition);
@@ -132,9 +135,9 @@ void ofApp::update()
                         puntoReal = kinects[d]->getWorldCoordinateAt(x, y);
                         
                         
-                        if (puntoReal.z > 1)
+                        if (puntoReal.z > 0)
                         {
-                            if (puntoReal.z < 3)
+                            if (puntoReal.z < 1.5)
                             {
                                 myNewColor = kinects[d]->getRegisteredPixels().getColor(x, y);
                                 if (caso == 4)
@@ -191,6 +194,21 @@ void ofApp::update()
         
 
     }
+    if (b_saving) {
+        if (ofGetSystemTimeMillis() > counter + delay) {
+            if (countDown == 1) {
+                // make a unique file name by including the system time in the name we save with
+                pointCloud.save("test"  ".ply");
+                b_saving = false;
+                dibu = 1;
+                now = ofGetElapsedTimef();
+            }
+            else {
+                countDown--;
+                counter = ofGetSystemTimeMillis();
+            }
+        }
+    }
 }
 
 
@@ -236,11 +254,24 @@ void ofApp::draw()
     {
         cam.begin();
         pointCloud.setMode(OF_PRIMITIVE_POINTS);
+        mesh2.setMode(OF_PRIMITIVE_POINTS);
         glPointSize(2);
         // Set the initial target position
         ofPushMatrix();
         ofScale(1500, -1500, -1500);
         pointCloud.draw();
+        
+        if (dibu == 1)
+        {
+            
+            if (now > nextEventSeconds) {
+                mesh2.load("test.ply");
+                
+                dibu = 0;
+            }
+            
+        }
+        mesh2.draw();
         ofPopMatrix();
         cam.end();
 
@@ -249,6 +280,13 @@ void ofApp::draw()
     if( kinects.size() < 1 ) {
         ofDrawBitmapStringHighlight( "No Kinects Detected", 40, 40 );
     }
+    /*if (b_saving) {
+        // if we are saving a file draw the countdown number to screen
+        font.drawString(ofToString(countDown), ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
+        ofDrawBitmapString(countDown, ofGetWidth()/2, ofGetHeight()/2);
+    }*/
+
+    
         
     panel.draw();
 }
@@ -257,10 +295,19 @@ void ofApp::draw()
 void ofApp::keyPressed(int key)
 {
     switch (key) {
+    case 's':
+        b_saving = true;
+        counter = ofGetSystemTimeMillis();
+        countDown = 3; // start our count down from 3
+        break;
+
     case ' ':
         currentKinect = (currentKinect + 1) % kinects.size();
+        break;
+
     case 'p':
         showPointCloud = !showPointCloud;
+        break;
 
     case '0':
         caso = 0;

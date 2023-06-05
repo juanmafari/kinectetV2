@@ -61,5 +61,16 @@ public:
 
     
     
-    bool showPointCloud = false;
+    bool showPointCloud = true;
+
+    //photobooth shi
+    int countDown;
+    float counter;
+    bool b_saving;
+    ofTrueTypeFont font;
+    ofMesh mesh2;
+    int dibu = 0;
+
+    float nextEventSeconds = 0;
+    float now;
 };

@@ -280,11 +280,11 @@ void ofApp::draw()
     if( kinects.size() < 1 ) {
         ofDrawBitmapStringHighlight( "No Kinects Detected", 40, 40 );
     }
-    /*if (b_saving) {
+    if (b_saving) {
         // if we are saving a file draw the countdown number to screen
         font.drawString(ofToString(countDown), ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
         ofDrawBitmapString(countDown, ofGetWidth()/2, ofGetHeight()/2);
-    }*/
+    }
 
     
         

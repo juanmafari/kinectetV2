@@ -69,9 +69,9 @@ void ofApp::setup()
     targetPosition.set(0, 0, 0);
     
 
-    panel.add(posx.setup("posx", 0, -1000, 1000));
+    panel.add(posx.setup("posx", -800, -1000, 1000));
     panel.add(posy.setup("posy", 0, -500, 500));
-    panel.add(posz.setup("posz", 0, -1500, 1500));
+    panel.add(posz.setup("posz", -1500, -1500, 1500));
     panel.add(camxx.setup("camx", 0, -5000, 5000));
     panel.add(camyy.setup("camy", 0, -500, 500));
     panel.add(camzz.setup("camz", 0, -2000, 2000));
@@ -83,7 +83,7 @@ void ofApp::setup()
 void ofApp::update()
 {
     int delay = 1000;
-
+    
     lookPosition.set(posx, posy, posz);
     cam.lookAt(lookPosition);
     float radius = 1000; // Adjust the radius of rotation as needed
@@ -95,6 +95,7 @@ void ofApp::update()
     cam.setPosition(camX, camY, camZ);
     // Increment the rotation angle
     rotationAngle += 0.01;
+    
     ofColor myNewColor;
     for (int d = 0; d < kinects.size(); d++)
     {
@@ -137,7 +138,7 @@ void ofApp::update()
                         
                         if (puntoReal.z > 0)
                         {
-                            if (puntoReal.z < 1.5)
+                            if (puntoReal.z < 3.6)
                             {
                                 myNewColor = kinects[d]->getRegisteredPixels().getColor(x, y);
                                 if (caso == 4)
@@ -198,7 +199,8 @@ void ofApp::update()
         if (ofGetSystemTimeMillis() > counter + delay) {
             if (countDown == 1) {
                 // make a unique file name by including the system time in the name we save with
-                pointCloud.save("test"  ".ply");
+                meshNum ++;
+                pointCloud.save("test" + ofToString(meshNum) + ".ply");
                 b_saving = false;
                 dibu = 1;
                 now = ofGetElapsedTimef();
@@ -254,7 +256,9 @@ void ofApp::draw()
     {
         cam.begin();
         pointCloud.setMode(OF_PRIMITIVE_POINTS);
+        mesh1.setMode(OF_PRIMITIVE_POINTS);
         mesh2.setMode(OF_PRIMITIVE_POINTS);
+        mesh3.setMode(OF_PRIMITIVE_POINTS);
         glPointSize(2);
         // Set the initial target position
         ofPushMatrix();
@@ -265,13 +269,28 @@ void ofApp::draw()
         {
             
             if (now > nextEventSeconds) {
-                mesh2.load("test.ply");
+                if (meshNum == 1)
+                {
+                    mesh1.load("test" + ofToString(meshNum) + ".ply");
+                }
+                else if (meshNum == 2)
+                {
+                    mesh2.load("test" + ofToString(meshNum) + ".ply");
+                }
+                else if (meshNum == 3)
+                {
+                    mesh3.load("test" + ofToString(meshNum) + ".ply");
+                    meshNum = 0;
+                }
+                
                 
                 dibu = 0;
             }
             
         }
+        mesh1.draw();
         mesh2.draw();
+        mesh3.draw();
         ofPopMatrix();
         cam.end();
 
@@ -282,7 +301,14 @@ void ofApp::draw()
     }
     if (b_saving) {
         // if we are saving a file draw the countdown number to screen
-        font.drawString(ofToString(countDown), ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
+        if (countDown == 1)
+        {
+            font.drawString("", ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
+        }
+        else
+        {
+            font.drawString(ofToString(countDown - 1), ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
+        }
         ofDrawBitmapString(countDown, ofGetWidth()/2, ofGetHeight()/2);
     }
 
@@ -298,7 +324,7 @@ void ofApp::keyPressed(int key)
     case 's':
         b_saving = true;
         counter = ofGetSystemTimeMillis();
-        countDown = 3; // start our count down from 3
+        countDown = 4; // start our count down from 3
         break;
 
     case ' ':

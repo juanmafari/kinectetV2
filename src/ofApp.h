@@ -7,7 +7,7 @@
 #include "ofxOpenCv.h"
 
 
-class ofApp: public ofBaseApp
+class ofApp : public ofBaseApp
 {
 public:
     void setup() override;
@@ -15,11 +15,11 @@ public:
     void draw() override;
 
     void keyPressed(int key) override;
-    
+
     void drawTextureAtRowAndColumn(const std::string& title,
-                                   const ofTexture& tex,
-                                   int row,
-                                   int column);
+        const ofTexture& tex,
+        int row,
+        int column);
 
     void mouseDragged(int x, int y, int button);
     void mousePressed(int x, int y, int button);
@@ -27,7 +27,7 @@ public:
     void mouseEntered(int x, int y);
     void mouseExited(int x, int y);
     void windowResized(int w, int h);
-    
+
     ofxPanel panel;
 
     std::vector<std::shared_ptr<ofxKinectV2>> kinects;
@@ -37,9 +37,9 @@ public:
     std::vector<ofTexture> texIR;
     std::vector<ofTexture> texDepth;
     ofDefaultVertexType puntoReal;
-    
+
     std::size_t currentKinect = 0;
-    
+
     int numRows = 2;
     int numColumns = 2;
     int caso = 0;
@@ -57,10 +57,10 @@ public:
     ofVec3f lookPosition;
     float rotationAngle = 0.01;
 
-    ofxFloatSlider posx, posy, posz, camxx,camyy,camzz;
+    ofxFloatSlider posx, posy, posz, camxx, camyy, camzz;
 
-    
-    
+
+
     bool showPointCloud = true;
 
     //photobooth shi
@@ -68,9 +68,12 @@ public:
     float counter;
     bool b_saving;
     ofTrueTypeFont font;
+    ofMesh mesh1;
     ofMesh mesh2;
+    ofMesh mesh3;
     int dibu = 0;
 
     float nextEventSeconds = 0;
     float now;
+    int meshNum = 0;
 };

@@ -26,7 +26,7 @@ void ofApp::setup()
     texIR.resize(kinects.size());
     
 
-    panel.setup("", "settings.xml", 10, 100);
+    
     
 	ofxKinectV2::Settings ksettings;
 	ksettings.enableRGB = true;
@@ -50,7 +50,7 @@ void ofApp::setup()
     for(int d = 0; d < kinects.size(); d++) {
         kinects[d] = std::make_shared<ofxKinectV2>();
         kinects[d]->open(deviceList[d].serial, ksettings);
-        panel.add(kinects[d]->params);
+        //panel.add(kinects[d]->params);
         
         
     }
@@ -62,39 +62,61 @@ void ofApp::setup()
 
     
 
-    panel.loadFromFile("settings.xml");
+    
 
     cam.setDistance(00);
+    //cam.setVFlip(true);
+    
 
     targetPosition.set(0, 0, 0);
     
 
-    panel.add(posx.setup("posx", -800, -1000, 1000));
-    panel.add(posy.setup("posy", 0, -500, 500));
-    panel.add(posz.setup("posz", -1500, -1500, 1500));
-    panel.add(camxx.setup("camx", 0, -5000, 5000));
-    panel.add(camyy.setup("camy", 0, -500, 500));
-    panel.add(camzz.setup("camz", 0, -2000, 2000));
-
     font.load("frabk.ttf", 400);
+
+    colorImage.allocate(ofGetWidth(), ofGetHeight());
+    grayscaleImage.allocate(ofGetWidth(), ofGetHeight());
+
+    ofEnableAlphaBlending(); // Habilita el mezclado alfa
+    ofBackground(0, 0, 0, 0);
+    image.allocate(ofGetWidth(), ofGetHeight(), ofImageType::OF_IMAGE_COLOR_ALPHA);
+    canva.load("CanvaComic.jpg");
 }
 
+void ofApp::setupGui() {
+    panel.setup("", "settings.xml", 10, 100);
+    panel.loadFromFile("settings.xml");
+
+    panel.add(posx.setup("posx", -310, -1000, 1000));
+    panel.add(posy.setup("posy", 0, -500, 500));
+    panel.add(posz.setup("posz", 1500, -1500, 1500));
+    panel.add(camxx.setup("camx", 0, 0, 1));
+    panel.add(camyy.setup("camy", 0, 0, 1));
+    panel.add(camzz.setup("camz", 0, 0, 1));
+    panel.add(photo.setup("photo"));
+
+
+    ofSetBackgroundColor(0);
+}
+
+void ofApp::drawGui(ofEventArgs& args) {
+    panel.draw();
+}
 
 void ofApp::update()
 {
-    int delay = 1000;
+    int delay = 500;
     
     lookPosition.set(posx, posy, posz);
     cam.lookAt(lookPosition);
     float radius = 1000; // Adjust the radius of rotation as needed
-    float camX = targetPosition.x + radius * cos(rotationAngle);
+    float camX = targetPosition.x; //+radius * cos(rotationAngle);
     float camY = targetPosition.y ;
-    float camZ = targetPosition.z + radius * sin(rotationAngle); // Adjust the camera's height if needed
+    float camZ = targetPosition.z; //+radius * sin(rotationAngle); // Adjust the camera's height if needed
     
     // Set the camera position
     cam.setPosition(camX, camY, camZ);
     // Increment the rotation angle
-    rotationAngle += 0.01;
+    //rotationAngle += 0.01;
     
     ofColor myNewColor;
     for (int d = 0; d < kinects.size(); d++)
@@ -138,7 +160,7 @@ void ofApp::update()
                         
                         if (puntoReal.z > 0)
                         {
-                            if (puntoReal.z < 3.6)
+                            if (puntoReal.z < 1.6)
                             {
                                 myNewColor = kinects[d]->getRegisteredPixels().getColor(x, y);
                                 if (caso == 4)
@@ -195,6 +217,12 @@ void ofApp::update()
         
 
     }
+    if (photo) {
+        b_saving = true;
+        counter = ofGetSystemTimeMillis();
+        countDown = 4; // start our count down from 3
+
+    }
     if (b_saving) {
         if (ofGetSystemTimeMillis() > counter + delay) {
             if (countDown == 1) {
@@ -218,8 +246,10 @@ void ofApp::update()
 
 void ofApp::draw()
 {
+    
     if (!showPointCloud && currentKinect < texRGB.size())
     {
+        
         ofBackground(0);
         
         drawTextureAtRowAndColumn("RGB Pixels",
@@ -254,15 +284,22 @@ void ofApp::draw()
     }
     else
     {
+        canva.resize(540, 960);
+        canva.draw(0, 0);
         cam.begin();
+        
         pointCloud.setMode(OF_PRIMITIVE_POINTS);
         mesh1.setMode(OF_PRIMITIVE_POINTS);
         mesh2.setMode(OF_PRIMITIVE_POINTS);
         mesh3.setMode(OF_PRIMITIVE_POINTS);
+        
         glPointSize(2);
         // Set the initial target position
         ofPushMatrix();
+        ofRotate(180, 1, -1, 0);
         ofScale(1500, -1500, -1500);
+
+        
         pointCloud.draw();
         
         if (dibu == 1)
@@ -271,14 +308,17 @@ void ofApp::draw()
             if (now > nextEventSeconds) {
                 if (meshNum == 1)
                 {
+                    
                     mesh1.load("test" + ofToString(meshNum) + ".ply");
                 }
                 else if (meshNum == 2)
                 {
+                    
                     mesh2.load("test" + ofToString(meshNum) + ".ply");
                 }
                 else if (meshNum == 3)
                 {
+                    
                     mesh3.load("test" + ofToString(meshNum) + ".ply");
                     meshNum = 0;
                 }
@@ -288,17 +328,19 @@ void ofApp::draw()
             }
             
         }
+        ofPopMatrix();
+        ofPushMatrix();
         mesh1.draw();
         mesh2.draw();
         mesh3.draw();
+        
         ofPopMatrix();
+
         cam.end();
 
     }
     
-    if( kinects.size() < 1 ) {
-        ofDrawBitmapStringHighlight( "No Kinects Detected", 40, 40 );
-    }
+    
     if (b_saving) {
         // if we are saving a file draw the countdown number to screen
         if (countDown == 1)
@@ -309,12 +351,18 @@ void ofApp::draw()
         {
             font.drawString(ofToString(countDown - 1), ofGetWidth() / 2 - font.stringWidth(ofToString(countDown)) / 2, ofGetHeight() / 2);
         }
-        ofDrawBitmapString(countDown, ofGetWidth()/2, ofGetHeight()/2);
+        //ofDrawBitmapString(countDown, ofGetWidth()/2, ofGetHeight()/2);
+  
+        image.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+
+        // Guarda la imagen en disco con canal alfa
+        image.save("screenshotfondo.png");
+
     }
+    
 
     
         
-    panel.draw();
 }
 
 

@@ -14,6 +14,10 @@ public:
     void update() override;
     void draw() override;
 
+
+    void setupGui();
+    void drawGui(ofEventArgs& args);
+
     void keyPressed(int key) override;
 
     void drawTextureAtRowAndColumn(const std::string& title,
@@ -58,7 +62,7 @@ public:
     float rotationAngle = 0.01;
 
     ofxFloatSlider posx, posy, posz, camxx, camyy, camzz;
-
+    ofxButton photo;
 
 
     bool showPointCloud = true;
@@ -66,7 +70,7 @@ public:
     //photobooth shi
     int countDown;
     float counter;
-    bool b_saving;
+    bool b_saving = false;
     ofTrueTypeFont font;
     ofMesh mesh1;
     ofMesh mesh2;
@@ -76,4 +80,11 @@ public:
     float nextEventSeconds = 0;
     float now;
     int meshNum = 0;
+
+    ofPixels pixels;
+    //foto captura coso
+    ofImage image;
+    ofImage canva;
+    ofxCvColorImage colorImage; // Crear una instancia de una imagen en color de OpenCV
+    ofxCvGrayscaleImage grayscaleImage;
 };
